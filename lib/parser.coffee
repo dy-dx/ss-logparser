@@ -555,6 +555,7 @@ handlers =
     player.setClass(role)
 
   sizzlingSessionId: (line, sessionId) ->
+    console.log JSON.stringify sessionId
     @emit 'got sessionid', sessionId
 
 regexTests = [
