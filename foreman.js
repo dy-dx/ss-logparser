@@ -175,7 +175,7 @@ LogStreamHandler.prototype.getMatchId = function (sessionId, cb) {
 
 LogStreamHandler.prototype.destroy = function () {
   var self = this;
-  var redisCounterKey = 'counter' + self.tf2server;
+  var redisCounterKey = 'counter:' + self.tf2server;
 
   self.redisClient.multi()
     .del(redisCounterKey)
