@@ -74,6 +74,7 @@ LogStreamHandler.prototype.setupListeners = function () {
                 , headers: {sessionid: self.sessionId}
                 , timeout: 3000
                 }, function (err, res, body) {
+      self.requestIsInProgress = false;
       if (err) {
         return console.log(err);
       }
@@ -82,7 +83,6 @@ LogStreamHandler.prototype.setupListeners = function () {
       }
 
       verbose && console.log(res.body);
-      self.requestIsInProgress = false;
     });
   });
 
@@ -119,8 +119,8 @@ LogStreamHandler.prototype.sendStatsUpdate = function (stats) {
     return false;
   }
 
-  verbose && console.log('stats update');
   if (self.requestIsInProgress) {
+    verbose && console.log('aborting stats update, request is in progress');
     return false;
   }
 
@@ -132,6 +132,7 @@ LogStreamHandler.prototype.sendStatsUpdate = function (stats) {
               , json: {stats: stats}
               , timeout: 3000
               }, function (err, res, body) {
+    self.requestIsInProgress = false;
     if (err) {
       console.log(err);
     }
@@ -140,7 +141,6 @@ LogStreamHandler.prototype.sendStatsUpdate = function (stats) {
     }
 
     verbose && console.log(res.body);
-    self.requestIsInProgress = false;
   });
 };
 
