@@ -134,7 +134,7 @@ LogStreamHandler.prototype.sendStatsUpdate = function (stats) {
               }, function (err, res, body) {
     self.requestIsInProgress = false;
     if (err) {
-      console.log(err);
+      return console.log(err);
     }
     if (res.statusCode > 202) {
       console.log(new Error('API Error: ' + res.statusCode));
