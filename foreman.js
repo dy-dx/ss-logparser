@@ -104,8 +104,9 @@ LogStreamHandler.prototype.setupListeners = function () {
     //   }
 
     //   verbose && console.log(res.body);
-      self.sessionid = null;
+    //   self.sessionid = null;
     // });
+    self.stopStreamingStats();
   });
 };
 
@@ -152,6 +153,7 @@ LogStreamHandler.prototype.startStreamingStats = function () {
 
 LogStreamHandler.prototype.stopStreamingStats = function () {
   clearTimeout(this.updateTimer);
+  this.updateTimer = 0;
 };
 
 LogStreamHandler.prototype.getMatchId = function (sessionId, cb) {
@@ -176,6 +178,8 @@ LogStreamHandler.prototype.getMatchId = function (sessionId, cb) {
 LogStreamHandler.prototype.destroy = function () {
   var self = this;
   var redisCounterKey = 'counter:' + self.tf2server;
+
+  self.stopStreamingStats();
 
   self.redisClient.multi()
     .del(redisCounterKey)
