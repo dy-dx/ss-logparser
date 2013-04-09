@@ -166,7 +166,7 @@ LogStreamHandler.prototype.getMatchId = function (sessionId, cb) {
 
     if (err) {return cb(err);}
     if (res.statusCode !== 200) {
-      return cb(new Error('Error checking sessionid: ' + res.statusCode));
+      return cb(new Error('Error checking sessionid: ' + res.statusCode + ' ' + body));
     }
 
     cb(null, parseInt(res.headers.matchid, 10));
@@ -220,7 +220,7 @@ subscriberClient.on('message', function (channel, tf2server) {
       if (!messageBuffer.length || messageBuffer.length < 2) {
         return console.log('length < 2???', messageBuffer);
       }
-      message = messageBuffer[1].toString('ascii').slice(5,-1);
+      message = messageBuffer[1].toString('ascii').slice(5,-2);
       logStreamHandler.parser.parse(message);
 
       process.nextTick(readMessage);

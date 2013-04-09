@@ -88,12 +88,13 @@ Log.prototype.sendLine = function (i) {
 };
 
 Log.prototype.addPaddingAndConvertToBuffer = function (line) {
-  // Add padding because the world is not fair
-  line = '     ' + line;
-  if (line[line.length-1] !== '\r') {
-    // add a CLRF if needed because the world is not fair
-    line += '\r';
+  // Add weird padding because the world is not fair
+  line = '����R' + line;
+  // More weird padding, because the world is not fair
+  if (line[line.length-1] == '\r') {
+    line = line.slice(0,-1);
   }
+  line += '\n\u0000';
 
   // Convert back to a buffer, because again, the world is not fair
   return new Buffer(line, 'ascii');
@@ -178,4 +179,6 @@ Log.prototype.getSessionId = function (cb) {
 // var LogA = new Log('./mockdata/log_17211.log', clientAddress, 8002, serverPort);
 // var LogB = new Log('./mockdata/log_17215.log', clientAddress, 8003, serverPort);
 // var LogC = new Log('./mockdata/walterwhite.log', clientAddress, 8004, serverPort, 10);
-var LogD = new Log('./mockdata/jay0912.log', clientAddress, 8005, serverPort, 5);
+
+// 8ms interval
+var LogD = new Log('./mockdata/jay0912.log', clientAddress, 8005, serverPort, 8);
