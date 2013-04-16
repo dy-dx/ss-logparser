@@ -200,6 +200,28 @@ LogStreamHandler.prototype.destroy = function () {
 var logStreamHandlers = {};
 var redisClients = {};
 
+var readMessage = function (client, logStreamHandler, tf2server) {
+  client.brpop(tf2server, cfg.loghandler_timeout, function (err, messageBuffer) {
+    if (err) {
+      console.log(err);
+      return logStreamHandler.destroy();
+    }
+    if (!messageBuffer) {
+      // Timeout expired, so handle that
+      verbose && console.log('Listener for', tf2server, 'timed out.');
+      return logStreamHandler.destroy();
+    }
+    if (!messageBuffer.length || messageBuffer.length < 2) {
+      console.log('length < 2???', messageBuffer);
+      return logStreamHandler.destroy();
+    }
+    message = messageBuffer[1].toString('ascii').slice(5,-2);
+    logStreamHandler.parser.parse(message);
+
+    process.nextTick(readMessage);
+  });
+};
+
 // param `channel` is 'logmessage'
 subscriberClient.on('message', function (channel, tf2server) {
   var logStreamHandler = logStreamHandlers[tf2server];
@@ -213,24 +235,7 @@ subscriberClient.on('message', function (channel, tf2server) {
     console.log('Creating new parser for list', tf2server);
   }
 
-  var readMessage = function () {
-    client.brpop(tf2server, cfg.loghandler_timeout, function (err, messageBuffer) {
-      if (err) {return console.log(err);}
-      if (!messageBuffer) {
-        // Timeout expired, so handle that
-        verbose && console.log('Listener for', tf2server, 'timed out.');
-        return logStreamHandler.destroy();
-      }
-      if (!messageBuffer.length || messageBuffer.length < 2) {
-        return console.log('length < 2???', messageBuffer);
-      }
-      message = messageBuffer[1].toString('ascii').slice(5,-2);
-      logStreamHandler.parser.parse(message);
-
-      process.nextTick(readMessage);
-    });
-  };
-  readMessage();
+  readMessage(client, logStreamHandler, tf2server);
 
 });
 

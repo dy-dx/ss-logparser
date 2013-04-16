@@ -213,10 +213,6 @@ class Match extends EventEmitter
     @bluCurrentScore = 0
     @bluRoundsWon = 0
 
-  # setMap: (@map) ->
-
-  # setIgnoreLog: (@ignoreLog) ->
-
   startMatch: () ->
     @isLive = true
     @currentRound = 0
@@ -302,26 +298,6 @@ class Match extends EventEmitter
     stats.players[id] = player.formattedStats(false) for id, player of @players
     return stats
 
-  # delete this stupid thing
-  # printInfo: () ->
-  #   msToHMS = (ms) ->
-  #     ms /= 1000
-  #     h = parseInt(ms/3600, 10)
-  #     m = parseInt((ms-h*3600)/60, 10)
-  #     s = ms-h*3600-m*60
-  #     if h == 0
-  #       return ('0'+m).slice(-2)+':'+('0'+s).slice(-2)
-  #     return h+':'+('0'+m).slice(-2)+':'+('0'+s).slice(-2)
-
-  #   for id, player of @players
-  #     for className, classStats of player.classStats when classStats.timePlayed
-  #       classStats.timePlayed = msToHMS(classStats.timePlayed)
-  #     # unless player.hasStats() then delete @players[id]
-  #   console.log util.inspect(@players, {depth: null})
-  #   console.log 'redscore:', @redScore, 'redroundswon:', @redRoundsWon
-  #   console.log 'bluscore:', @bluScore, 'bluroundswon:', @bluRoundsWon
-  #   console.log 'teamfirstcap:', @teamfirstcap
-
   getOrInsertPlayer: (ignore, name, userId, steamId, team) ->
     identifier = if steamId != 'BOT' then steamId else userId
 
@@ -354,11 +330,6 @@ class Match extends EventEmitter
     )
 
     line = line.substring(23)
-
-    # If ignoring log, then start listening again when you see this:
-    if @ignoreLog
-      if /^server cvars end$/.test(line) then @ignoreLog = false
-      return
 
     @runTests line, @regexTests, (matchingTests) ->
       if self.debug && matchingTests.length != 1
@@ -398,10 +369,6 @@ module.exports = Match
 
 
 handlers =
-  loadingMap: (line, map) ->
-    this.setIgnoreLog true
-    this.initialize()
-    this.setMap map
 
   roundStart: () ->
     this.startRound()
@@ -555,8 +522,10 @@ handlers =
     player.setClass(role)
 
   sizzlingSessionId: (line, sessionId) ->
-    console.log JSON.stringify sessionId
     @emit 'got sessionid', sessionId
+
+  sizzlingError: (line, error) ->
+    console.log error
 
 regexTests = [
   # [SizzlingStats] events
@@ -571,6 +540,10 @@ regexTests = [
   [ 'SizzlingStats: sessionid'
     'sizzlingSessionId'
     /^\[SizzlingStats\]: sessionid (.*)$/ ]
+
+  [ 'SizzlingStats: Error'
+    'sizzlingError'
+    /^\[SizzlingStats\]: Error "(.*)"$/ ]
 
 
   [ 'Team current score'

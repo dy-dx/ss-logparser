@@ -10,8 +10,8 @@ var cfg = {
 , redis_password: process.env.REDIS_PASSWORD
 
 // foreman options
-, verbose: true
-// , verbose: false
+// , verbose: true
+, verbose: false
 , ss_address: 'http://localhost:8001'
 // , ss_address: 'http://sizzlingstats.com:8011'
 // , ss_address: 'http://localhost:8011'
