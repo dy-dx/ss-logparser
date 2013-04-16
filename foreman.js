@@ -218,7 +218,9 @@ var readMessage = function (client, logStreamHandler, tf2server) {
     message = messageBuffer[1].toString('ascii').slice(5,-2);
     logStreamHandler.parser.parse(message);
 
-    process.nextTick(readMessage);
+    process.nextTick(function () {
+      readMessage(client, logStreamHandler, tf2server);
+    });
   });
 };
 
